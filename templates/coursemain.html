@@ -2,14 +2,16 @@
  {% block content %}
     <div class="container"> 
     <div class="jumbotron">
-      <h1>{{coursename}}</h1>
+      <h1 class="text-center">{{coursename[0][0]}}</h1>
     </div> 
   	</div>
-  	{% for i in questions %}
+  	{% for i in q %}
   	<div class="container"> 
-    <div class="jumbotron">
-      <p>{{i[0]}}</p>
-    </div> 
-  	</div>	
+    <a href={{'/answers/'+i[0][3]}}><div class="jumbotron">
+      <p>{{i[0][1]}}</p>
+      <br><br>
+      <small>Poster: {{i[1]}}</small>
+    </div></a> 
+  	</div>
   	{% endfor %}
  {% endblock %}

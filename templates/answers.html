@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+ {% block content %}
+ 	<div class=container><div class="jumbotron"><h1 class="text-center">{{ques[0][0]}}</h1></div></div>
+	{% for i in ans %}
+		<div class="container"><div class="jumbotron">
+			<p>{{i[2]}}</p>
+		</div></div>
+	{% endfor %}
+ {% endblock %}
