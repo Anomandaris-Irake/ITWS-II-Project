@@ -1,5 +1,18 @@
-from flask import Flask,redirect,url_for,render_template
+from flask import Flask,redirect,url_for,render_template,request
 import sqlite3
+from wtforms import Form, BooleanField, TextField, PasswordField, validators, StringField
+
+
+class AnswerForm(Form):
+    Answer = TextField('Answer', [validators.Length(min=4, max=1000)])
+
+
+class QuestionForm(Form):
+    Question = TextField('Answer', [validators.Length(min=4, max=1000)])
+
+
+conn=sqlite3.connect('data.db', check_same_thread=False)
+c=conn.cursor()
 
 app=Flask(__name__)
 @app.route('/')
@@ -9,10 +22,10 @@ def index():
 
 @app.route('/courses/')
 @app.route('/courses/<courseid>')
-def course(courseid=None):
-	conn=sqlite3.connect('data.db')
-	c=conn.cursor()
-	c.execute('select course from courses where courseid=?', (courseid,))
+def course(courseid=1):
+	global c
+	global conn
+	c.execute('select course,courseid from courses where courseid=?', (courseid,))
 	coursename=c.fetchall()
 	c.execute('select uid,question,courseid,qid from questions where courseid=?',(courseid,))
 	ques=c.fetchall()
@@ -22,28 +35,60 @@ def course(courseid=None):
 		a=c.fetchall()
 		q.append([i,a[0][0]])
 	return render_template("coursemain.html", coursename=coursename, q=q)
-	conn.commit()
-	conn.close()
 
 @app.route('/answers/')
 @app.route('/answers/<qid>')
-def showanswers(qid=None):
-	conn=sqlite3.connect('data.db')
-	c=conn.cursor()
+def showanswers(qid=1):
+	global c
+	global conn
 	c.execute('select * from answers where qid=?',(qid,))
 	ans=c.fetchall()
-	c.execute('select question from questions where qid=?',(qid,))
+	c.execute('select question,qid from questions where qid=?',(qid,))
 	ques=c.fetchall()
 	return render_template("answers.html", ques=ques,ans=ans)
-	conn.commit()
-	conn.close()
 
 @app.route('/allcourses/')
 def showcourses():
-	conn=sqlite3.connect('data.db')
-	c=conn.cursor()
+	global c
+	global conn
 	c.execute('''select * from courses''')
 	courses=c.fetchall()
 	return render_template('allcourses.html', courses=courses)
-	conn.commit()
-	conn.close()
+
+@app.route('/trial')
+def trial():
+	return redirect(url_for('index'))
+
+@app.route('/submitanswer/<qid>',methods=['GET','POST'])
+def submitanswer(qid=1):
+	error=None
+	form=AnswerForm(request.form)
+	global c
+	global conn
+	if request.method=='POST':
+		answer=form.Answer.data
+		t=(qid,1,answer)
+		c.execute('insert into answers values(?,?,?)',t)
+		conn.commit()
+		return redirect(url_for('index'))
+	return render_template('submitanswer.html',form=form)
+
+@app.route('/submitquestion/<courseid>',methods=['GET','POST'])
+def submitquestion(courseid=1):
+	error=None
+	form=QuestionForm(request.form)
+	global c
+	global conn
+	if request.method=='POST':
+		question=form.Question.data
+		c.execute('select courseid from questions')
+		Ques=c.fetchall()
+		qid=len(Ques)+1
+		t=(qid,1,courseid,question)
+		c.execute('insert into questions values(?,?,?,?)',t)
+		conn.commit()
+		return redirect(url_for('index'))
+	return render_template('submitquestion.html',form=form)
+
+
+
