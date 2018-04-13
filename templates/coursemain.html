@@ -7,11 +7,12 @@
   	</div>
   	{% for i in q %}
   	<div class="container"> 
-    <a href={{'/answers/'+i[0][3]}}><div class="jumbotron">
-      <p>{{i[0][1]}}</p>
+    <div class="jumbotron">
+      <a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
       <br><br>
       <small>Poster: {{i[1]}}</small>
-    </div></a> 
+      <div class="text-right"><h2><span class="glyphicon glyphicon-arrow-up"></span>{{i[0][4]}}<span class="glyphicon glyphicon-arrow-down"></span></h2></div>
+    </div> 
   	</div>
   	{% endfor %}
     <div class="container">

@@ -8,7 +8,7 @@ class AnswerForm(Form):
 
 
 class QuestionForm(Form):
-    Question = TextField('Answer', [validators.Length(min=4, max=1000)])
+    Question = TextField('Question', [validators.Length(min=4, max=1000)])
 
 
 conn=sqlite3.connect('data.db', check_same_thread=False)
@@ -22,13 +22,14 @@ def index():
 
 @app.route('/courses/')
 @app.route('/courses/<courseid>')
-def course(courseid=1):
+def showquestions(courseid=1):
 	global c
 	global conn
 	c.execute('select course,courseid from courses where courseid=?', (courseid,))
 	coursename=c.fetchall()
-	c.execute('select uid,question,courseid,qid from questions where courseid=?',(courseid,))
-	ques=c.fetchall()
+	c.execute('select uid,question,courseid,qid,upvotes from questions where courseid=?',(courseid,))
+	qu=c.fetchall()
+	ques=sorted(qu,key=lambda x:x[4],reverse=True)
 	q=[]
 	for i in ques:
 		c.execute('select name from users where uid=?',(i[0],))
@@ -42,7 +43,8 @@ def showanswers(qid=1):
 	global c
 	global conn
 	c.execute('select * from answers where qid=?',(qid,))
-	ans=c.fetchall()
+	a=c.fetchall()
+	ans=sorted(a,key=lambda x:x[3],reverse=True)
 	c.execute('select question,qid from questions where qid=?',(qid,))
 	ques=c.fetchall()
 	return render_template("answers.html", ques=ques,ans=ans)
@@ -67,8 +69,8 @@ def submitanswer(qid=1):
 	global conn
 	if request.method=='POST':
 		answer=form.Answer.data
-		t=(qid,1,answer)
-		c.execute('insert into answers values(?,?,?)',t)
+		t=(qid,1,answer,0)
+		c.execute('insert into answers values(?,?,?,?)',t)
 		conn.commit()
 		return redirect(url_for('index'))
 	return render_template('submitanswer.html',form=form)
@@ -84,8 +86,8 @@ def submitquestion(courseid=1):
 		c.execute('select courseid from questions')
 		Ques=c.fetchall()
 		qid=len(Ques)+1
-		t=(qid,1,courseid,question)
-		c.execute('insert into questions values(?,?,?,?)',t)
+		t=(qid,1,courseid,question,1)
+		c.execute('insert into questions values(?,?,?,?,?)',t)
 		conn.commit()
 		return redirect(url_for('index'))
 	return render_template('submitquestion.html',form=form)
