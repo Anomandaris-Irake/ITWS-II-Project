@@ -145,3 +145,29 @@ def logout():
         name = session.pop('username')
         return render_template("result.html",message=name+" has logged out")
     return render_template("result.html",message="Please login first :-)")
+
+@app.route('/showpage/')
+def showpage():
+    global c
+    global conn
+    name=session['username']
+    c.execute('select * from users where name=?',(name,))
+    pg=c.fetchall()
+    uid=pg[0][0]
+    c.execute('select uid,question,courseid,qid,upvotes from questions where uid=?',(uid,))
+    qu=c.fetchall()
+    ques=sorted(qu,key=lambda x:x[4],reverse=True)
+    q=[]
+    for i in ques:
+        c.execute('select name from users where uid=?',(i[0],))
+        a=c.fetchall()
+        q.append([i,a[0][0]])
+    c.execute('select uid,answer,qid,upvotes from answers where uid=?',(uid,))
+    an=c.fetchall()
+    ans=sorted(an,key=lambda x:x[3],reverse=True)
+    s=[]
+    for i in ans:
+        c.execute('select question,qid from questions where qid=?',(i[2],))
+        a=c.fetchall()
+        s.append([i,a[0][0],a[0][1]])
+    return render_template('showpage.html',pg=pg,q=q,s=s)
