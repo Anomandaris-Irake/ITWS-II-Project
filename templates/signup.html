@@ -7,6 +7,9 @@
 	<form method=post action="/signup">
 		<dl>
 			{{render_field(form.name)}}
+			{% if username_taken == 1 %}
+			<div class="text-danger bg-warning">Username already taken.</div>
+			{% endif %}
 			{{render_field(form.email)}}
 			{{render_field(form.password)}}
 			{{render_field(form.confirm)}}
@@ -14,7 +17,6 @@
 		</dl>
 		<p><input type=submit value=Register></p>
 	</form>
-
 	{% if error %}
 	<p class="error"><strong>Error:</strong>{{error}}</p>
 	{% endif %}

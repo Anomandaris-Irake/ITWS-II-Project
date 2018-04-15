@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+	{% block content %}
+<div class = "container">
+	<h4>Login</h4>
+	<br>
+	{% from "_formhelpers.html" import render_field %}
+	<form method=post action="/login/">
+		<dl>
+			{{render_field(form.Username)}}
+			{{render_field(form.Password)}}
+			{{render_field(form.Rememberme)}}
+			{% if wrong==1 %}
+			<div class="text-danger bg-warning">Unable to login. Please check username and password.</div>
+			{% endif %}
+		</dl>
+		<p><input type=submit value=Login></p>
+	</form>
+
+	{% if error %}
+	<p class="error"><strong>Error:</strong>{{error}}</p>
+	{% endif %}
+
+</div>
+
+
+ {% endblock %}

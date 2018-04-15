@@ -8,14 +8,18 @@
   	{% for i in q %}
   	<div class="container"> 
     <div class="jumbotron">
+      <blockquote>
       <a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
-      <br><br>
-      <small>Poster: {{i[1]}}</small>
+      <footer>Posted By: {{i[1]}}</footer>
       <div class="text-right"><h2><span class="glyphicon glyphicon-arrow-up"></span>{{i[0][4]}}<span class="glyphicon glyphicon-arrow-down"></span></h2></div>
     </div> 
   	</div>
   	{% endfor %}
     <div class="container">
+    {% if 'username' in session %}
     <div class="text-right"><a href={{'/submitquestion/'+coursename[0][1]}}><button type="button" class="btn btn-primary">Submit Question</button></a></div>
+    {% else %}
+    <div class="text-right"><a href="/login/"><button type="button" class="btn btn-primary">Submit Question</button></a></div>
+    {% endif %}
     </div>
  {% endblock %}
