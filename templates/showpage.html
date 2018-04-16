@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+	<div class="jumbotron">
+		<h1 class="text-center">{{pg[0][1]}}</h1><br>
+		<center>
+			<b>email address : {{pg[0][2]}}</b>
+		</center>
+	</div>
+</div>
+<h1 class="text-center">QUESTIONS {{pg[0][1]}} asked :</h1><br>
+{% for i in q %}
+<div class="container"> 
+	<div class="jumbotron">
+		<blockquote>
+			<a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
+			<div class="text-right"><h2><span class="glyphicon glyphicon-arrow-up"></span>{{i[0][4]}}<span class="glyphicon glyphicon-arrow-down"></span></h2></div>
+	</div> 
+</div>
+{% endfor %}
+<h1 class="text-center">ANSWERS {{pg[0][1]}} had for :</h1><br>
+{% for i in s %}
+<div class="container"> 
+		<div class="jumbotron">
+		<blockquote>
+			<a href={{'/answers/'+i[2]}}><p>{{i[1]}}</p></a>
+			<footer>Answer: {{i[0][1]}}</footer>
+			<div class="text-right"><h2><span class="glyphicon glyphicon-arrow-up"></span>{{i[0][3]}}<span class="glyphicon glyphicon-arrow-down"></span></h2></div>
+									</div> 
+</div>
+{% endfor %}
+
+{% endblock %}

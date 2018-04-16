@@ -146,7 +146,6 @@ def logout():
         return render_template("result.html",message=name+" has logged out")
     return render_template("result.html",message="Please login first :-)")
 
-
 @app.route('/user/<uid>')
 def showuser(uid=1):
 	global c
@@ -162,6 +161,8 @@ def showuser(uid=1):
 	x=c.fetchall()
 	for i in x:
 		totalupvotes+=i[0]
-	return render_template('showuser.html', user=user,totalupvotes=totalupvotes)
-
-
+	c.execute('select question,qid from questions where uid=?',(uid,))
+	ques=c.fetchall()
+	c.execute('select questions.question,questions.qid,answers.answer from questions,answers where answers.qid=questions.qid and answers.uid=?',(uid,))
+	ans=c.fetchall()
+	return render_template('showuser.html', user=user,ques=ques,ans=ans,totalupvotes=totalupvotes)
