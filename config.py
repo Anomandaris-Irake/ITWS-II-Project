@@ -20,6 +20,7 @@ class RegistrationForm(Form):
     password = PasswordField('password', [validators.Required(),validators.EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Repeat Password')
     accept_tos = BooleanField('I accept the Terms of Service and Privacy Notice (updated Apr 08, 2018)', [validators.Required()])
+    description = TextField('Tell us something about yourselves')
 
 def authenticate(request):
 	con = sqlite3.connect("data.db")
@@ -35,6 +36,9 @@ def authenticate(request):
 		if status:
 			msg = username + "has logged in successfully"
 			session['username'] = username
+			cursor.execute('select uid from users where name=?', (username,))
+			x=cursor.fetchone()
+			session['uid']=x[0]
 	else:
 		msg = username + "login failed"
 

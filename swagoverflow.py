@@ -109,7 +109,7 @@ def signup():
         global conn
         c.execute("select * from users where name = ?",(name,))
         x=c.fetchall()
-
+        description=form.description.data
         if len(x) > 0:
             flash("That username is already taken, please choose another")
             return render_template('signup.html',form=form,username_taken=1)
@@ -117,7 +117,7 @@ def signup():
             c.execute('select uid from users')
             usrs=c.fetchall()
             uid=len(usrs)+1		
-            c.execute("insert into users values (?,?,?,?)",(uid, name, email, password))
+            c.execute("insert into users values (?,?,?,?,?)",(uid, name, email, password,description))
             conn.commit()
             flash("Thanks for registering!")
             return redirect(url_for('login'))
@@ -145,3 +145,23 @@ def logout():
         name = session.pop('username')
         return render_template("result.html",message=name+" has logged out")
     return render_template("result.html",message="Please login first :-)")
+
+
+@app.route('/user/<uid>')
+def showuser(uid=1):
+	global c
+	global conn
+	c.execute('select * from users where uid=?',(uid,))
+	user=c.fetchone()
+	totalupvotes=0
+	c.execute('select upvotes from questions where uid=?', (uid,))
+	x=c.fetchall()
+	for i in x:
+		totalupvotes+=i[0]
+	c.execute('select upvotes from answers where uid=?', (uid,))
+	x=c.fetchall()
+	for i in x:
+		totalupvotes+=i[0]
+	return render_template('showuser.html', user=user,totalupvotes=totalupvotes)
+
+

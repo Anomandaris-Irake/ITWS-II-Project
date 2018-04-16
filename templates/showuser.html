@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+ {% block content %}
+      <div class="container">
+        <div class="jumbotron">
+          <h1 class="text-center">{{user[1]}}</h1>
+          <blockquote>
+            <p>{{user[4]}}</p>
+            <footer>
+              <i>{{user[1]}}</i>
+            </footer>
+          </blockquote>
+          <p>Total Upvotes: {{totalupvotes}}</p>
+          <p>Email: {{user[2]}}</p>
+        </div>
+      </div>
+ {% endblock %}
