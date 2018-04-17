@@ -11,11 +11,26 @@ c=conn.cursor()
 app=Flask(__name__)
 app.secret_key = 'MKhJHJH798798kjhkjhkjGHh'
 
-    
+
 @app.route('/')
-@app.route('/index')
+@app.route('/index',methods=["GET", "POST"])
 def index():
-	return render_template('index.html')
+	form=SearchBar(request.form)
+	if request.method=="GET":
+		return render_template('index.html',form=form)
+	elif request.method=="POST":
+		search=form.search.data
+		c.execute('select * from courses where courses match ?',(search,))
+		courses=c.fetchall()
+		numcourses=len(courses)
+		c.execute('select * from questions where question match ?',(search,))
+		q=c.fetchall()
+		ques=sorted(q,key=	lambda x:x[4],reverse=True)
+		numques=len(ques)
+		c.execute('select * from users where name match ?',(search,))
+		users=c.fetchall()
+		numusers=len(users)
+		return render_template('searchresults.html',courses=courses,numcourses=numcourses,ques=ques,numques=numques,users=users,numusers=numusers,search=search)
 
 @app.route('/courses/')
 @app.route('/courses/<courseid>')
@@ -91,7 +106,7 @@ def submitquestion(courseid=1):
         c.execute('select uid from users where name=?',(name,))
         x=c.fetchall()
         userid=x[0][0]
-        t=(qid,userid,courseid,question,1)
+        t=(str(qid),userid,courseid,question,1)
         c.execute('insert into questions values(?,?,?,?,?)',t)
         conn.commit()
         return redirect(url_for('index'))
@@ -117,7 +132,7 @@ def signup():
             c.execute('select uid from users')
             usrs=c.fetchall()
             uid=len(usrs)+1		
-            c.execute("insert into users values (?,?,?,?,?)",(uid, name, email, password,description))
+            c.execute("insert into users values (?,?,?,?,?)",(str(uid), name, email, password,description))
             conn.commit()
             flash("Thanks for registering!")
             return redirect(url_for('login'))
@@ -135,7 +150,7 @@ def login():
             return render_template("login.html", form=form, wrong=1)
         if(authenticate(request)==True):
             if not next:
-                return render_template("index.html")
+                return redirect(url_for('index'))
             else:
                 return redirect(next)
 

@@ -22,6 +22,9 @@ class RegistrationForm(Form):
     accept_tos = BooleanField('I accept the Terms of Service and Privacy Notice (updated Apr 08, 2018)', [validators.Required()])
     description = TextField('Tell us something about yourselves')
 
+class SearchBar(Form):
+	search=TextField("Search")
+
 def authenticate(request):
 	con = sqlite3.connect("data.db")
 	username = request.form['Username']
@@ -38,7 +41,7 @@ def authenticate(request):
 			session['username'] = username
 			cursor.execute('select uid from users where name=?', (username,))
 			x=cursor.fetchone()
-			session['uid']=x[0]
+			session['uid']=str(x[0])
 	else:
 		msg = username + "login failed"
 

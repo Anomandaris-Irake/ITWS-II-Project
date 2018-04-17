@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+	<h1 class="container"> Search results for {{search}}</h1>
+	{% if numcourses!=0 %}
+		<h2 class="container">Courses:-</h2>
+		{% for i in courses %}
+			<div class="container"><div class="jumbotron">
+				<a href={{'/courses/'+i[0]}}><p>{{i[1]}}</p></a>
+			</div></div>
+		{% endfor %}
+	{% endif %}
+	{% if numques!=0 %}
+		<h2 class="container">Questions:-</h2>
+		{% for i in ques %}
+			<div class="container"><div class="jumbotron">
+				<a href={{'/answers/'+i[0]}}><p>{{i[3]}}</p></a>
+			</div></div>
+		{% endfor %}
+	{% endif %}
+	{% if numusers!=0 %}
+		<h2 class="container">Users:-</h2>
+		{% for i in users %}
+			<div class="container"><div class="jumbotron">
+				<a href={{'/user/'+i[0]}}><p>{{i[1]}}</p></a>
+			</div></div>
+		{% endfor %}
+	{% endif %}
+{% endblock %}
