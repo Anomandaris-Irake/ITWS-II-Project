@@ -15,7 +15,7 @@
 	{% endfor %}
 	<div class="container">
 	{% if 'username' in session %}
-	<div class="text-right"><a href={{'/submitanswer/'+ques[0][1]}}><button type="button" class="btn btn-primary">Submit Answer</button></a></div>
+	<div class="text-right"><a href={{'/submitanswer/'+ques[1]}}><button type="button" class="btn btn-primary">Submit Answer</button></a></div>
  	{% else %}
 	<div class="text-right"><a href={{'/login/'}}><button type="button" class="btn btn-primary">Submit Answer</button></a></div>
  	{% endif %}

@@ -109,7 +109,7 @@ def submitquestion(courseid=1):
         c.execute('select uid from users where name=?',(name,))
         x=c.fetchall()
         userid=x[0][0]
-        t=(str(qid),userid,courseid,question,1)
+        t=(str(qid),userid,courseid,question,0)
         c.execute('insert into questions values(?,?,?,?,?)',t)
         conn.commit()
         return redirect(url_for('index'))
@@ -216,7 +216,6 @@ def answer_upvote(aid,previous_link,uid):
         c.execute('select * from answer_votes where aid=?',(aid,))
         x=c.fetchall()
         upvotes=len(x)
-        upvotes+=1
         c.execute('update answers set upvotes=? where aid=?',(upvotes,aid,))
         return redirect(url_for("showanswers",qid=previous_link))
     else:
