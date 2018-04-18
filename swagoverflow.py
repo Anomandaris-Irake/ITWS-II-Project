@@ -1,8 +1,8 @@
 from flask import Flask,flash,redirect,url_for,render_template,request
 import sqlite3
 from passlib.hash import sha512_crypt
-from wtforms import Form, BooleanField, TextField, PasswordField, validators, StringField
 from config import *
+from wtforms import Form, BooleanField, TextField, PasswordField, validators, StringField
 
 
 conn=sqlite3.connect('data.db', check_same_thread=False)
@@ -58,7 +58,7 @@ def showanswers(qid=1):
     a=c.fetchall()
     ans=sorted(a,key=lambda x:x[3],reverse=True)
     c.execute('select question,qid from questions where qid=?',(qid,))
-    ques=c.fetchall()
+    ques=c.fetchone()
     return render_template("answers.html", ques=ques,ans=ans)
 
 @app.route('/allcourses/')
@@ -78,15 +78,18 @@ def submitanswer(qid=1):
     if 'username' not in session:
     	return redirect(url_for('login'))
     if request.method=='POST':
-	    answer=form.Answer.data
-	    name=session['username']
-	    c.execute('select uid from users where name=?', (name,))
-	    x=c.fetchall()
-	    userid=x[0][0]
-	    t=(qid,userid,answer,0)
-	    c.execute('insert into answers values(?,?,?,?)',t)
-	    conn.commit()
-	    return redirect(url_for('index'))
+        answer=form.Answer.data
+        name=session['username']
+        c.execute('select uid from users where name=?', (name,))
+        x=c.fetchall()
+        userid=x[0][0]
+        c.execute('select * from answers')
+        x=c.fetchall()
+        aid=len(x)+1
+        t=(qid,userid,answer,0,str(aid))
+        c.execute('insert into answers values(?,?,?,?,?)',t)
+        conn.commit()
+        return redirect(url_for('index'))
     return render_template('submitanswer.html',form=form)
 
 @app.route('/submitquestion/<courseid>',methods=['GET','POST'])
@@ -181,3 +184,40 @@ def showuser(uid=1):
 	c.execute('select questions.question,questions.qid,answers.answer from questions,answers where answers.qid=questions.qid and answers.uid=?',(uid,))
 	ans=c.fetchall()
 	return render_template('showuser.html', user=user,ques=ques,ans=ans,totalupvotes=totalupvotes)
+
+@app.route('/question_upvote/<qid>/<uid>/<previous_link>')
+def question_upvote(previous_link,qid,uid):
+    global c
+    global conn
+    c.execute('select * from question_votes where uid=? and qid=?',(uid,qid,))
+    x=c.fetchall()
+    if(len(x)==0):
+        c.execute('insert into question_votes values(?,?)', (qid,uid))
+        conn.commit()
+        c.execute('select upvotes from questions where qid=?',(qid,))
+        x=c.fetchone()
+        upvotes=x[0]
+        upvotes+=1
+        c.execute('update questions set upvotes=? where qid=?',(upvotes,qid))
+        return redirect(url_for("showquestions",courseid=previous_link))
+    else:
+        return redirect(url_for("showquestions",courseid=previous_link))
+
+
+@app.route('/answer_upvote/<aid>/<uid>/<previous_link>')
+def answer_upvote(aid,previous_link,uid):
+    global c
+    global conn
+    c.execute('select * from answer_votes where uid=? and aid=?',(uid,aid,))
+    x=c.fetchall()
+    if(len(x)==0):
+        c.execute('insert into answer_votes values(?,?)', (aid,uid,))
+        conn.commit()
+        c.execute('select * from answer_votes where aid=?',(aid,))
+        x=c.fetchall()
+        upvotes=len(x)
+        upvotes+=1
+        c.execute('update answers set upvotes=? where aid=?',(upvotes,aid,))
+        return redirect(url_for("showanswers",qid=previous_link))
+    else:
+        return redirect(url_for("showanswers",qid=previous_link))

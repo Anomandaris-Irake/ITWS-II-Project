@@ -11,7 +11,11 @@
       <blockquote>
       <a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
       <footer>Posted By: <a href={{'/user/'+i[0][0]}}>{{i[1]}}</a></footer>
-      <div class="text-right"><h2><span class="glyphicon glyphicon-arrow-up"></span>{{i[0][4]}}<span class="glyphicon glyphicon-arrow-down"></span></h2></div>
+      <div class="text-right"><h2>
+      <a href={{url_for("question_upvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'])}}>
+        <span class="glyphicon glyphicon-arrow-up"></span></a>{{i[0][4]}}
+        <span class="glyphicon glyphicon-arrow-down"></span>
+      </h2></div>
     </div> 
   	</div>
   	{% endfor %}
