@@ -12,10 +12,18 @@
       <a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
       <footer>Posted By: <a href={{'/user/'+i[0][0]}}>{{i[1]}}</a></footer>
       <div class="text-right"><h2>
+      {% if 'username' in session %}
       <a href={{url_for("question_upvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'])}}>
         <span class="glyphicon glyphicon-arrow-up"></span></a>{{i[0][4]}}
+      <a href={{url_for("question_downvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'])}}>
         <span class="glyphicon glyphicon-arrow-down"></span>
       </h2></div>
+      {% else %}
+      <a href='/login/'}}>
+        <span class="glyphicon glyphicon-arrow-up"></span></a>{{i[0][4]}}
+       <a href="/login/"> <span class="glyphicon glyphicon-arrow-down"></span></a>
+      </h2></div>
+      {% endif %}
     </div> 
   	</div>
   	{% endfor %}

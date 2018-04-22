@@ -67,7 +67,9 @@ def showcourses():
     global conn
     c.execute('''select * from courses''')
     courses=c.fetchall()
-    return render_template('allcourses.html', courses=courses)
+    c.execute('select * from subscriptions')
+    subscriptions=c.fetchall()
+    return render_template('allcourses.html', courses=courses,subscriptions=subscriptions,toreturn='0')
 
 @app.route('/submitanswer/<qid>',methods=['GET','POST'])
 def submitanswer(qid=1):
@@ -199,6 +201,7 @@ def question_upvote(previous_link,qid,uid):
         upvotes=x[0]
         upvotes+=1
         c.execute('update questions set upvotes=? where qid=?',(upvotes,qid))
+        conn.commit()
         return redirect(url_for("showquestions",courseid=previous_link))
     else:
         return redirect(url_for("showquestions",courseid=previous_link))
@@ -217,6 +220,70 @@ def answer_upvote(aid,previous_link,uid):
         x=c.fetchall()
         upvotes=len(x)
         c.execute('update answers set upvotes=? where aid=?',(upvotes,aid,))
+        conn.commit()
         return redirect(url_for("showanswers",qid=previous_link))
     else:
         return redirect(url_for("showanswers",qid=previous_link))
+
+
+@app.route('/question_downvote/<qid>/<uid>/<previous_link>')
+def question_downvote(previous_link,qid,uid):
+    global c
+    global conn
+    c.execute('delete from question_votes where uid=? and qid=?',(uid,qid))
+    conn.commit()
+    c.execute('select * from question_votes where qid=?',(qid,))
+    x=c.fetchall()
+    upvotes=len(x)
+    c.execute('update questions set upvotes=? where qid=?',(upvotes,qid))
+    conn.commit()
+    return redirect(url_for("showquestions",courseid=previous_link))
+
+
+@app.route('/answer_downvote/<aid>/<uid>/<previous_link>')
+def answer_downvote(aid,previous_link,uid):
+    global c
+    global conn
+    c.execute('delete from answer_votes where uid=? and aid=?',(uid,aid,))
+    conn.commit()
+    c.execute('select * from answer_votes where aid=?', (aid,))
+    x=c.fetchall()
+    upvotes=len(x)
+    c.execute('update answers set upvotes=? where aid=?', (upvotes,aid,))
+    conn.commit()
+    return redirect(url_for("showanswers",qid=previous_link))
+
+@app.route('/subscribe/<uid>/<courseid>')
+def subscribe(uid,courseid):
+    global c
+    global conn
+    c.execute('insert into subscriptions values(?,?)',(uid,courseid,))
+    conn.commit()
+    return redirect(url_for('showcourses'))
+
+
+@app.route('/unsubscribe/<uid>/<courseid>/<toreturn>')
+def unsubscribe(uid,courseid,toreturn):
+    global c
+    global conn
+    c.execute('delete from subscriptions where uid=? and courseid=?',(uid,courseid,))
+    conn.commit()
+    if(toreturn!='1'):
+        return redirect(url_for('showcourses'))
+    else:
+        return redirect(url_for('mysubscriptions'))
+
+@app.route('/mysubscriptions/')
+def mysubscriptions():
+    global c
+    global conn
+    c.execute('select courseid from subscriptions where uid=?', (session['uid'],))
+    courseids=c.fetchall()
+    courses=[]
+    for i in courseids:
+        c.execute('select course from courses where courseid=?',(i[0],))
+        coursename=c.fetchone()
+        courses.append((i[0],coursename[0]))
+    c.execute('select * from subscriptions where uid=?', session['uid'])
+    subscriptions=c.fetchall()
+    return render_template('allcourses.html', courses=courses,subscriptions=subscriptions,toreturn='1')

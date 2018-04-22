@@ -1,8 +1,26 @@
 {% extends 'base.html' %}
  {% block content %}
+	{% if 'username' not in session %}
 	{% for i in courses %}
-		<div class="container"><a href={{'/courses/'+i[0]}}><div class="jumbotron">
-			<h1 class="text-center">{{i[1]}}</h1>
-		</div></a></div>
+	<div class="container"><div class="jumbotron">
+			<a href={{'/courses/'+i[0]}}><h1 class="text-center">{{i[1]}}</h1>
+			<a href='/login/' class="text-right"><span class="glyphicon glyphicon-plus"></span></a>
+		</h1></div></div>
 	{% endfor %}
+	{% else %}
+	{% for i in courses %}
+	{% if (session['uid'],i[0]) not in subscriptions %}
+	<div class="container"><div class="jumbotron">
+			<a href={{'/courses/'+i[0]}}><h1 class="text-center">{{i[1]}}</h1>
+			<a href={{url_for("subscribe",uid=session['uid'],courseid=i[0],toreturn=toreturn)}} class="text-right"><span class="glyphicon glyphicon-plus"></span></a>
+		</h1></div></div>
+	{% else %}
+	<div class="container"><div class="jumbotron">
+			<a href={{'/courses/'+i[0]}}><h1 class="text-center">{{i[1]}}</h1>
+			<a href={{url_for("unsubscribe",uid=session['uid'],courseid=i[0],toreturn=toreturn)}} class="text-right"><span class="glyphicon glyphicon-minus"></span></a>
+		</h1></div></div>
+	{% endif %}
+	{% endfor %}
+	{% endif %}
+	
  {% endblock %}
