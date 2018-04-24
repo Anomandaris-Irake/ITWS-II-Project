@@ -37,5 +37,12 @@ input[type=text] {
 		</div>
 	</form>
 	</center>
+	<div class="jumbotron">
+		{% if 'username' in session %}
+		<p>Welcome {{session['username']}}</p>
+		{% else %}
+		<p><a href="/signup">Register</a> or <a href="/login/">Login</a> for full features.</p>
+		{% endif %}
+	</div>
 </div>
 {% endblock %}

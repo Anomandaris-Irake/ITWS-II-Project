@@ -17,9 +17,15 @@
     <ul class="nav navbar-nav">
       <li class="active"><a href="/allcourses/">Courses</a></li>
     </ul>
+    {% if 'username' in session %}
     <ul class="nav navbar-nav">
       <li class="active"><a href="/mysubscriptions/">My Subscriptions</a></li>
     </ul>
+    {% else %}
+    <ul class="nav navbar-nav">
+      <li class="active"><a href="/login/">My Subscriptions</a></li>
+    </ul>
+    {% endif %}
     <form class="navbar-form navbar-left" action="/action_page.php">
       <div class="input-group">
       </div>
