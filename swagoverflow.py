@@ -182,24 +182,33 @@ def logout():
 
 @app.route('/user/<uid>')
 def showuser(uid=1):
-	global c
-	global conn
-	c.execute('select * from users where uid=?',(uid,))
-	user=c.fetchone()
-	totalupvotes=0
-	c.execute('select upvotes from questions where uid=?', (uid,))
-	x=c.fetchall()
-	for i in x:
-		totalupvotes+=i[0]
-	c.execute('select upvotes from answers where uid=?', (uid,))
-	x=c.fetchall()
-	for i in x:
-		totalupvotes+=i[0]
-	c.execute('select question,qid from questions where uid=?',(uid,))
-	ques=c.fetchall()
-	c.execute('select questions.question,questions.qid,answers.answer from questions,answers where answers.qid=questions.qid and answers.uid=?',(uid,))
-	ans=c.fetchall()
-	return render_template('showuser.html', user=user,ques=ques,ans=ans,totalupvotes=totalupvotes)
+    global c
+    global conn
+    c.execute('select * from users where uid=?',(uid,))
+    user=c.fetchone()
+    totalupvotes=0
+    c.execute('select upvotes from questions where uid=?', (uid,))
+    x=c.fetchall()
+    for i in x :
+        totalupvotes+=i[0]
+    c.execute('select upvotes from answers where uid=?', (uid,))
+    x=c.fetchall()
+    for i in x :
+        totalupvotes+=i[0]
+    c.execute('select question,qid from questions where uid=?',(uid,))
+    ques=c.fetchall()
+    aq=[]
+    uq=[]
+    for i in ques :
+        c.execute('select * from answers where qid=?',(ques[0][1],))
+        ps=c.fetchall()
+        if(len(ps)>0) :
+            aq.append(i)
+        else :
+            uq.append(i)
+    c.execute('select questions.question,questions.qid,answers.answer,answers.aid from questions,answers where answers.qid=questions.qid and answers.uid=?',(uid,))
+    ans=c.fetchall()
+    return render_template('showuser.html', user=user,aq=aq , uq=uq , ans=ans,totalupvotes=totalupvotes)
 
 @app.route('/question_upvote/<qid>/<uid>/<previous_link>')
 def question_upvote(previous_link,qid,uid):
@@ -301,3 +310,66 @@ def mysubscriptions():
     c.execute('select * from subscriptions where uid=?', session['uid'])
     subscriptions=c.fetchall()
     return render_template('allcourses.html', courses=courses,subscriptions=subscriptions,toreturn='1')
+
+@app.route('/editpage/<uid>', methods=["GET","POST"])
+def editpage(uid):
+    form = EditForm(request.form)
+    if request.method == "POST" :
+        global c
+        global conn
+        a = len(str(form.email.data))
+        email = form.email.data
+        b = len(str(form.password.data))
+        password = sha512_crypt.encrypt((str(form.password.data)))
+        d = len(str(form.description.data))
+        description = form.description.data
+        if a>0 :
+            c.execute("update users set email = ? where uid = ?",(email,uid,))
+        if b>0 :
+            c.execute("update users set password = ? where uid = ?",(password,uid,))
+        if d>0 :
+            c.execute("update users set description = ? where uid = ?",(description,uid,))
+        conn.commit()
+        return redirect(url_for('index'))
+
+    return render_template('editpage.html', form=form, uid=str(uid))
+
+@app.route('/editquestion/<qid>', methods=["GET","POST"])
+def editquestion(qid):
+    form = EditQuestion(request.form)
+    q=[]
+    c.execute("select question from questions where qid=?",(qid,))
+    b=c.fetchall()
+    for i in b:
+        q.append(i)
+    if request.method == "POST" :
+        global c
+        global conn
+        a = len(str(form.question.data))
+        question = form.question.data
+        if a>0 :
+            c.execute("update questions set question = ? where qid = ?",(question,qid,))
+        conn.commit()
+        return redirect(url_for('index'))
+
+    return render_template('editquestion.html', form=form, qid=qid, q=q)
+
+@app.route('/editanswer/<aid>', methods=["GET","POST"])
+def editanswer(aid):
+    form = EditAnswer(request.form)
+    ans=[]
+    c.execute("select answer from answers where aid=?",(aid,))
+    b=c.fetchall()
+    for i in b:
+        ans.append(i)
+    if request.method == "POST" :
+        global c
+        global conn
+        a = len(str(form.answer.data))
+        answer = form.answer.data
+        if a>0 :
+            c.execute("update answers set answer = ? where aid = ?",(answer,aid,))
+        conn.commit()
+        return redirect(url_for('index'))
+
+    return render_template('editanswer.html', form=form, aid=aid, ans=ans)
