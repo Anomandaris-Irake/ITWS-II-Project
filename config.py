@@ -45,4 +45,4 @@ def authenticate(request):
 	else:
 		msg = username + "login failed"
 
-	return status					
+	return status										
