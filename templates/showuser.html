@@ -6,55 +6,67 @@
 	color: #ffffff;
 }
 .bg-2 { 
-	    background-color: #474e5d; /* Dark Blue */
-	    color: #ffffff;
+	background-color: #474e5d; /* Dark Blue */
+	color: #ffffff;
 }
 .bg-3 { 
-	    background-color: #fff; /* White */
-	    color: #555555;
+	background-color: #fff; /* White */
+	color: #555555;
 }
 </style>
 <div class="container-fluid bg-1 text-center">
 	{% if 0<=totalupvotes<2 %}
-		<img src="../static/star1.png" class="img-circle" alt="1 star" width="350" height="350">
-		<h3> BOND MINOR(1 star) </h3>
+	<img src="../static/star1.png" class="img-circle" alt="1 star" width="350" height="350">
+	<h3> BOND MINOR(1 star) </h3>
 	{% endif %}
 	{% if 2<=totalupvotes<4 %}
-		<img src="../static/my_star_tattoo_stencil_by_mimikat.jpg" class="img-circle" alt="1 star" width="350" height="350">
-		<h3> BOND(2 stars) </h3>
+	<img src="../static/my_star_tattoo_stencil_by_mimikat.jpg" class="img-circle" alt="1 star" width="350" height="350">
+	<h3> BOND(2 stars) </h3>
 	{% endif %}
 	{% if 4<=totalupvotes<6 %}
-		<img src="../static/Stars-From-Sun-Tattoo-Stencil-6.jpg" class="img-circle" alt="1 star" width="350" height="350">
-		<h3> BOND RA(3 stars) </h3>	
+	<img src="../static/Stars-From-Sun-Tattoo-Stencil-6.jpg" class="img-circle" alt="1 star" width="350" height="350">
+	<h3> BOND RA(3 stars) </h3>	
 	{% endif %}
 	{% if 6<=totalupvotes<8 %}
-		<img src="../static/Maui-Wedding-Reception.jpg" class="img-circle" alt="1 star" width="350" height="350">	
-		<h3> BOND++(4 stars) </h3>
+	<img src="../static/Maui-Wedding-Reception.jpg" class="img-circle" alt="1 star" width="350" height="350">	
+	<h3> BOND++(4 stars) </h3>
 	{% endif %}
 	{% if 8<=totalupvotes<10 %}
-		<img src="../static/5start-img.png" class="img-circle" alt="1 star" width="350" height="350">
-		<h3> BOND#(5 stars) </h3>
+	<img src="../static/5start-img.png" class="img-circle" alt="1 star" width="350" height="350">
+	<h3> BOND#(5 stars) </h3>
 	{% endif %}
 	{% if 10<=totalupvotes %}
-		<img src="../static/index.jpeg" class="img-circle" alt="1 star" width="350" height="350">
-		<h3> BOND_MAX(7 stars) </h3>
+	<img src="../static/index.jpeg" class="img-circle" alt="1 star" width="350" height="350">
+	<h3> BOND_MAX(7 stars) </h3>
 	{% endif %}
 	<h1 class="text-center">User Profile: {{user[1]}}</h1>
-		<blockquote>
-			<p>{{user[4]}}</p>
-			<footer>
-				<i>{{user[1]}}</i>
-			</footer>
-		</blockquote>
-		<p>Total Upvotes: {{totalupvotes}}</p>
-		<p>Email: {{user[2]}}</p>
+	<blockquote>
+		<p>{{user[4]}}</p>
+		<footer>
+			<i>{{user[1]}}</i>
+		</footer>
+	</blockquote>
+	<p>Total Upvotes: {{totalupvotes}}</p>
+	<p>Email: {{user[2]}}</p>
 </div>
 <div class="container">
 	<h1 class="text-left">User activity:</h1>
-	<h2 class="text-left">Questions asked by {{user[1]}}:</h2>
-	{% for i in ques %}
+	<h2 class="text-left">Questions asked by {{user[1]}} (answered):</h2>
+	{% for i in aq %}
 	<div class="jumbotron">
 		<a href={{'/answers/'+i[1]}}><p>{{i[0]}}</p></a>
+		{% if 'username' in session %}
+			<div class="text-right"><a href={{'/editquestion/'+i[1]}}><button type="button" class="btn btn-primary">Edit Question</button></a></div>
+		{% endif %}
+	</div>
+	{% endfor %}
+	<h2 class="text-left">Questions asked by {{user[1]}} (unanswered):</h2>
+	{% for i in uq %}
+	<div class="jumbotron">
+		<a href={{'/answers/'+i[1]}}><p>{{i[0]}}</p></a>
+		{% if 'username' in session %}
+			<div class="text-right"><a href={{'/editquestion/'+i[1]}}><button type="button" class="btn btn-primary">Edit Question</button></a></div>
+		{% endif %}
 	</div>
 	{% endfor %}
 	<h2 class="text-left">Answers by {{user[1]}}:</h2>
@@ -62,7 +74,15 @@
 	<div class="jumbotron">
 		<p>Question :<a href={{'/answers/'+i[1]}}>{{i[0]}}</a></p>
 		<p> Answer: {{i[2]}}</p>
+		{% if 'username' in session %}
+			<div class="text-right"><a href={{'/editanswer/'+i[3]}}><button type="button" class="btn btn-primary">Edit Answer</button></a></div>
+		{% endif %}
 	</div>
 	{% endfor %}
+</div>
+<div class="container">
+	{% if 'username' in session %}
+	<div class="text-right"><a href={{'/editpage/'+user[0]}}><button type="button" class="btn btn-primary">Edit Profile Page</button></a></div>
+	{% endif %}
 </div>
 {% endblock %}
