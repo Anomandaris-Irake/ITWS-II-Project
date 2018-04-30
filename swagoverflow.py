@@ -33,33 +33,47 @@ def index():
 		return render_template('searchresults.html',courses=courses,numcourses=numcourses,ques=ques,numques=numques,users=users,numusers=numusers,search=search)
 
 @app.route('/courses/')
-@app.route('/courses/<courseid>')
-def showquestions(courseid=1):
+@app.route('/courses/<courseid>/<page>')
+def showquestions(courseid=1,page=1,sortby="upvotes"):
     global c
     global conn
     c.execute('select course,courseid from courses where courseid=?', (courseid,))
     coursename=c.fetchall()
     c.execute('select uid,question,courseid,qid,upvotes from questions where courseid=?',(courseid,))
     qu=c.fetchall()
-    ques=sorted(qu,key=lambda x:x[4],reverse=True)
-    q=[]
+    if 'sortby' not in request.args:
+            ques=sorted(qu,key=lambda x:x[4],reverse=True)
+    elif request.args['sortby']=="upvotes":
+        ques=sorted(qu,key=lambda x:x[4],reverse=True)
+    elif request.args['sortby']!="upvotes":
+        ques=sorted(qu,key=lambda x:x[3],reverse=True)
+    qe=[]
+    totalpages=(len(qu)//5)+1
     for i in ques:
         c.execute('select name from users where uid=?',(i[0],))
         a=c.fetchall()
-        q.append([i,a[0][0]])
-    return render_template("coursemain.html", coursename=coursename, q=q)
+        qe.append([i,a[0][0]])
+    q=qe[5*(int(page)-1):5*(int(page))]
+    return render_template("coursemain.html", coursename=coursename, q=q,totalpages=totalpages,page=page)
 
 @app.route('/answers/')
-@app.route('/answers/<qid>')
-def showanswers(qid=1):
+@app.route('/answers/<qid>/<page>')
+def showanswers(qid=1,page=1,sortby="upvotes"):
     global c
     global conn
     c.execute('select answers.*,name from answers,users where answers.uid=users.uid and qid=?',(qid,))
     a=c.fetchall()
-    ans=sorted(a,key=lambda x:x[3],reverse=True)
+    totalpages=(len(a)//5)+1
+    if 'sortby' not in request.args:
+        an=sorted(a,key=lambda x:x[3],reverse=True)
+    elif request.args['sortby']=="upvotes":
+        an=sorted(a,key=lambda x:x[3],reverse=True)
+    elif request.args['sortby']!="upvotes":
+        an=sorted(a,key=lambda x:x[1],reverse=True)
+    ans=an[5*(int(page)-1):5*(int(page))]
     c.execute('select question,qid from questions where qid=?',(qid,))
     ques=c.fetchone()
-    return render_template("answers.html", ques=ques,ans=ans)
+    return render_template("answers.html", ques=ques,ans=ans,totalpages=totalpages,page=page,qid=qid)
 
 @app.route('/allcourses/')
 def showcourses():
@@ -202,9 +216,9 @@ def question_upvote(previous_link,qid,uid):
         upvotes+=1
         c.execute('update questions set upvotes=? where qid=?',(upvotes,qid))
         conn.commit()
-        return redirect(url_for("showquestions",courseid=previous_link))
+        return redirect(url_for("showquestions",courseid=previous_link,page=1))
     else:
-        return redirect(url_for("showquestions",courseid=previous_link))
+        return redirect(url_for("showquestions",courseid=previous_link,page=1))
 
 
 @app.route('/answer_upvote/<aid>/<uid>/<previous_link>')
@@ -221,9 +235,9 @@ def answer_upvote(aid,previous_link,uid):
         upvotes=len(x)
         c.execute('update answers set upvotes=? where aid=?',(upvotes,aid,))
         conn.commit()
-        return redirect(url_for("showanswers",qid=previous_link))
+        return redirect(url_for("showanswers",qid=previous_link,page=1))
     else:
-        return redirect(url_for("showanswers",qid=previous_link))
+        return redirect(url_for("showanswers",qid=previous_link,page=1))
 
 
 @app.route('/question_downvote/<qid>/<uid>/<previous_link>')
@@ -237,7 +251,7 @@ def question_downvote(previous_link,qid,uid):
     upvotes=len(x)
     c.execute('update questions set upvotes=? where qid=?',(upvotes,qid))
     conn.commit()
-    return redirect(url_for("showquestions",courseid=previous_link))
+    return redirect(url_for("showquestions",courseid=previous_link,page=1))
 
 
 @app.route('/answer_downvote/<aid>/<uid>/<previous_link>')
@@ -251,7 +265,7 @@ def answer_downvote(aid,previous_link,uid):
     upvotes=len(x)
     c.execute('update answers set upvotes=? where aid=?', (upvotes,aid,))
     conn.commit()
-    return redirect(url_for("showanswers",qid=previous_link))
+    return redirect(url_for("showanswers",qid=previous_link,page=1))
 
 @app.route('/subscribe/<uid>/<courseid>')
 def subscribe(uid,courseid):

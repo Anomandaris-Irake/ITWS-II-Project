@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
  {% block content %}
  	<div class=container><div class="jumbotron"><h1 class="text-center">{{ques[0]}}</h1></div></div>
+ 	<div class="container">
+      Sort By:
+      <a href={{url_for("showanswers",qid=qid,page=page,sortby="upvotes")}}><button type="button" class="btn btn-primary">Upvotes</button></a>
+      &nbsp
+      <a href={{url_for("showanswers",qid=qid,page=page,sortby="qid")}}><button type="button" class="btn btn-primary">Recently asked</button></a>
+    </div>
+    <br>
 	{% for i in ans %}
 		<div class="container"><div class="jumbotron">
 		<blockquote>	
@@ -9,10 +16,10 @@
 	</blockquote>
       <div class="text-right"><h2>
       	{% if 'username' in session %}
-		<a href={{url_for("answer_upvote",aid=i[4],previous_link=ques[1],uid=session['uid'])}}>
+		<a href={{url_for("answer_upvote",aid=i[4],previous_link=ques[1],uid=session['uid'],page=page)}}>
       	<span class="glyphicon glyphicon-arrow-up"></span></a>
       	{{i[3]}}
-      	<a href={{url_for("answer_downvote",aid=i[4],previous_link=ques[1],uid=session['uid'])}}><span class="glyphicon glyphicon-arrow-down"></span></a></h2></div>
+      	<a href={{url_for("answer_downvote",aid=i[4],previous_link=ques[1],uid=session['uid'],page=page)}}><span class="glyphicon glyphicon-arrow-down"></span></a></h2></div>
 		{% else %}
 		<a href="/login/"}}>
       	<span class="glyphicon glyphicon-arrow-up"></span></a>
@@ -28,5 +35,16 @@
 	<div class="text-right"><a href={{'/login/'}}><button type="button" class="btn btn-primary">Submit Answer</button></a></div>
  	{% endif %}
  	</div>
+ 	<div class="text-center">
+    	<ul class="pagination">
+        	{% for i in range(1,totalpages+1) %}
+          		{% if i!=page %}
+          			<li><a href={{"/answers/{}/{}".format(qid,i)}}>{{i}}</a></li>
+          		{% else %}
+          			<li class="active"><a href="#">{{i}}</a></li>
+          		{% endif %}
+        	{% endfor %}
+      </ul>
+    </div>
  	<br><br><br><br>
  {% endblock %}

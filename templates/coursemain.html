@@ -5,17 +5,24 @@
       <h1 class="text-center">{{coursename[0][0]}}</h1>
     </div> 
   	</div>
+    <div class="container">
+      Sort By:
+      <a href={{url_for("showquestions",courseid=coursename[0][1],page=page,sortby="upvotes")}}><button type="button" class="btn btn-primary">Upvotes</button></a>
+      &nbsp
+      <a href={{url_for("showquestions",courseid=coursename[0][1],page=page,sortby="qid")}}><button type="button" class="btn btn-primary">Recently asked</button></a>
+    </div>
+    <br>
   	{% for i in q %}
   	<div class="container"> 
     <div class="jumbotron">
       <blockquote>
-      <a href={{'/answers/'+i[0][3]}}><p>{{i[0][1]}}</p></a>
+      <a href={{'/answers/'+i[0][3]+'/1'}}><p>{{i[0][1]}}</p></a>
       <footer>Posted By: <a href={{'/user/'+i[0][0]}}>{{i[1]}}</a></footer>
       <div class="text-right"><h2>
       {% if 'username' in session %}
-      <a href={{url_for("question_upvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'])}}>
+      <a href={{url_for("question_upvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'],page=page)}}>
         <span class="glyphicon glyphicon-arrow-up"></span></a>{{i[0][4]}}
-      <a href={{url_for("question_downvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'])}}>
+      <a href={{url_for("question_downvote",previous_link=coursename[0][1],qid=i[0][3],uid=session['uid'],page=page)}}>
         <span class="glyphicon glyphicon-arrow-down"></span>
       </h2></div>
       {% else %}
@@ -33,5 +40,16 @@
     {% else %}
     <div class="text-right"><a href="/login/"><button type="button" class="btn btn-primary">Submit Question</button></a></div>
     {% endif %}
+    </div>
+    <div class="text-center">
+      <ul class="pagination">
+        {% for i in range(1,totalpages+1) %}
+          {% if i!=page %}
+          <li><a href={{"/courses/{}/{}".format(coursename[0][1],i)}}>{{i}}</a></li>
+          {% else %}
+          <li class="active"><a href="#">{{i}}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
     </div>
  {% endblock %}
