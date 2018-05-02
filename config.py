@@ -6,6 +6,9 @@ from wtforms import Form, BooleanField, TextField, PasswordField, validators, St
 class AnswerForm(Form):
     Answer = TextField('Answer', [validators.Length(min=4, max=1000)])
 
+class EditAnswer(Form):
+    answer = TextField('Answer', [validators.length(min=4, max=1000)])
+
 class LoginForm(Form):
     Username = TextField('Username', [validators.Length(min=4, max=1000)])
     Password = PasswordField('Password', [validators.Length(min=4, max=1000)])
@@ -13,6 +16,9 @@ class LoginForm(Form):
 
 class QuestionForm(Form):
     Question = TextField('Question', [validators.Length(min=4, max=1000)])
+
+class EditQuestion(Form):
+    question = TextField('Question', [validators.Length(min=4, max=1000)])
 
 class RegistrationForm(Form):
     name = TextField('name', [validators.Length(min=4, max=20)])
@@ -45,4 +51,10 @@ def authenticate(request):
 	else:
 		msg = username + "login failed"
 
-	return status										
+	return status
+
+class EditForm(Form):
+    email = TextField('email', [validators.Length(min=6, max=50)])
+    password = PasswordField('password', [validators.Required(),validators.EqualTo('confirm', message='Passwords must match')])
+    confirm = PasswordField('Repeat Password')
+    description = TextField('Edit the description u had')
