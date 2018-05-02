@@ -208,7 +208,7 @@ def showuser(uid=1):
             uq.append(i)
     c.execute('select questions.question,questions.qid,answers.answer,answers.aid from questions,answers where answers.qid=questions.qid and answers.uid=?',(uid,))
     ans=c.fetchall()
-    return render_template('showuser.html', user=user,aq=aq , uq=uq , ans=ans,totalupvotes=totalupvotes)
+    return render_template('showuser.html', user=user,aq=aq , uq=uq , ans=ans,totalupvotes=totalupvotes,uid=uid)
 
 @app.route('/question_upvote/<qid>/<uid>/<previous_link>')
 def question_upvote(previous_link,qid,uid):

@@ -54,8 +54,8 @@
 	<h2 class="text-left">Questions asked by {{user[1]}} (answered):</h2>
 	{% for i in aq %}
 	<div class="jumbotron">
-		<a href={{'/answers/'+i[1]}}><p>{{i[0]}}</p></a>
-		{% if 'username' in session %}
+		<a href={{'/answers/'+i[1]+"/1"}}><p>{{i[0]}}</p></a>
+		{% if 'username' in session and session['uid']==uid %}
 			<div class="text-right"><a href={{'/editquestion/'+i[1]}}><button type="button" class="btn btn-primary">Edit Question</button></a></div>
 		{% endif %}
 	</div>
@@ -63,8 +63,8 @@
 	<h2 class="text-left">Questions asked by {{user[1]}} (unanswered):</h2>
 	{% for i in uq %}
 	<div class="jumbotron">
-		<a href={{'/answers/'+i[1]}}><p>{{i[0]}}</p></a>
-		{% if 'username' in session %}
+		<a href={{'/answers/'+i[1]+"/1"}}><p>{{i[0]}}</p></a>
+		{% if 'username' in session and session['uid']==uid %}
 			<div class="text-right"><a href={{'/editquestion/'+i[1]}}><button type="button" class="btn btn-primary">Edit Question</button></a></div>
 		{% endif %}
 	</div>
@@ -72,16 +72,16 @@
 	<h2 class="text-left">Answers by {{user[1]}}:</h2>
 	{% for i in ans %}
 	<div class="jumbotron">
-		<p>Question :<a href={{'/answers/'+i[1]}}>{{i[0]}}</a></p>
+		<p>Question :<a href={{'/answers/'+i[1]+"/1"}}>{{i[0]}}</a></p>
 		<p> Answer: {{i[2]}}</p>
-		{% if 'username' in session %}
+		{% if 'username' in session and session['uid']==uid %}
 			<div class="text-right"><a href={{'/editanswer/'+i[3]}}><button type="button" class="btn btn-primary">Edit Answer</button></a></div>
 		{% endif %}
 	</div>
 	{% endfor %}
 </div>
 <div class="container">
-	{% if 'username' in session %}
+	{% if 'username' in session and session['uid']==uid %}
 	<div class="text-right"><a href={{'/editpage/'+user[0]}}><button type="button" class="btn btn-primary">Edit Profile Page</button></a></div>
 	{% endif %}
 </div>

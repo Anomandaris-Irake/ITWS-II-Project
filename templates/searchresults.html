@@ -5,7 +5,7 @@
 		<h2 class="container">Courses:-</h2>
 		{% for i in courses %}
 			<div class="container"><div class="jumbotron">
-				<a href={{'/courses/'+i[0]}}><p>{{i[1]}}</p></a>
+				<a href={{'/courses/'+i[0]+"/1"}}><p>{{i[1]}}</p></a>
 			</div></div>
 		{% endfor %}
 	{% endif %}
@@ -13,7 +13,7 @@
 		<h2 class="container">Questions:-</h2>
 		{% for i in ques %}
 			<div class="container"><div class="jumbotron">
-				<a href={{'/answers/'+i[0]}}><p>{{i[3]}}</p></a>
+				<a href={{'/answers/'+i[0]+"/1"}}><p>{{i[3]}}</p></a>
 			</div></div>
 		{% endfor %}
 	{% endif %}
